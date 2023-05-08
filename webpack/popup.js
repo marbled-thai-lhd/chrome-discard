@@ -3,7 +3,7 @@ const {
 } = require('path');
 const HtmlPlugin = require('html-webpack-plugin'); // eslint-disable-line
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // eslint-disable-line
-const VueLoaderPlugin = require('vue-loader/lib/plugin'); // eslint-disable-line
+const { VueLoaderPlugin } = require('vue-loader'); // eslint-disable-line
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -60,14 +60,12 @@ module.exports = {
 			{
 				test: /\.(eot|ttf|woff|woff2)(\?\S*)?$/,
 				loader: 'file-loader',
-				esModule: false,
 			},
 			{
 				test: /\.(png|jpg|svg|gif|svg)$/,
 				loader: 'file-loader',
 				options: {
 					name: 'img/[name].[ext]?[hash]',
-					esModule: false,
 				},
 			},
 		],
@@ -83,8 +81,8 @@ module.exports = {
 		}),
 
 		new HtmlPlugin({
-			template: resolve(__dirname, '../templates/popup.html'),
-			filename: 'index.html',
+			template: resolve(__dirname, '../src/popup/popup.html'),
+			filename: 'popup/index.html',
 		}),
 	],
 };

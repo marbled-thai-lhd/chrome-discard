@@ -1,4 +1,6 @@
-const { resolve } = require('path');
+const {
+	resolve
+} = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin'); // eslint-disable-line
 
@@ -38,19 +40,21 @@ module.exports = {
 		],
 	},
 	plugins: [
-		new CopyWebpackPlugin([{
-				from: './templates/manifest.json',
-				to: '/dist/manifest.json',
-				transform: () => {
-					manifestTemplate.version = pkg.version;
+		new CopyWebpackPlugin({
+			patterns: [{
+					from: './templates/manifest.json',
+					to: '/dist/manifest.json',
+					transform: () => {
+						manifestTemplate.version = pkg.version;
 
-					return Buffer.from(JSON.stringify(manifestTemplate, null, 2));
+						return Buffer.from(JSON.stringify(manifestTemplate, null, 2));
+					},
 				},
-			},
-			{
-				from: './src/assets',
-				to: 'dist/assets',
-			},
-		]),
+				{
+					from: resolve(__dirname, '../src/assets/'),
+					to: resolve(__dirname, '../dist/assets/'),
+				}
+			]
+		}, ),
 	],
 };
