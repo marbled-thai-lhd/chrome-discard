@@ -1,4 +1,4 @@
-import { ACTIVATED, EXCEPT } from "./const";
+import { ACTIVATED, DEFAULT_SETTING_TTL, EXCEPT, SETTING_TTL } from "./const";
 
 export const checkActive = async () => await getSingleKey(ACTIVATED);
 
@@ -28,6 +28,10 @@ export const deleteExceptionUrl = async url => {
 export const getExptionList = async () => {
 	const keys = Object.keys(await chrome.storage.local.get(null));
 	return keys.filter(k => k.indexOf(EXCEPT) == 0).map(k => k.replace(EXCEPT, ''));
+}
+
+export const getTTL = async () => {
+	return (await getSingleKey(SETTING_TTL)) || DEFAULT_SETTING_TTL;
 }
 
 const getSingleKey = async key => (await chrome.storage.local.get([key]))[key];

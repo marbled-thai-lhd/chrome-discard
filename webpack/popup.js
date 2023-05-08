@@ -17,7 +17,6 @@ module.exports = {
 	output: {
 		path: resolve(__dirname, '../dist/'),
 		filename: 'popup/index.js',
-		clean: true
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.vue', '.scss', '.css'],
