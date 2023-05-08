@@ -13,5 +13,5 @@ export const discardTab = async (tabId, force = false, callback = () => {}) => {
 }
 
 export const discardAllTab = async () => {
-	await getAllTabs().forEach(tab => discardTab(tab.id));
+	(await getAllTabs()).forEach(tab => !tab.discarded && discardTab(tab.id));
 }
