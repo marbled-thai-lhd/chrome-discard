@@ -43,7 +43,7 @@ module.exports = {
 		new CopyWebpackPlugin({
 			patterns: [{
 					from: './templates/manifest.json',
-					to: '/dist/manifest.json',
+					to: './manifest.json',
 					transform: () => {
 						manifestTemplate.version = pkg.version;
 
@@ -51,8 +51,8 @@ module.exports = {
 					},
 				},
 				{
-					from: resolve(__dirname, '../src/assets/'),
-					to: resolve(__dirname, '../dist/assets/'),
+					from: './src/assets/',
+					to: './assets/',
 				}
 			]
 		}, ),
