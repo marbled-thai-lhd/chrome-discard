@@ -1,4 +1,4 @@
-import { ACTIVATED } from "./const";
+import { ACTIVATED, EXCEPT } from "./const";
 
 export const checkActive = async () => await getSingleKey(ACTIVATED);
 
@@ -15,7 +15,9 @@ export const checkExceptionUrl = async url => {
 
 export const setExceptionUrl = async url => {
 	const key = getExceptionKeyFromUrl(url);
-	await chrome.storage.local.set(key, true)
+	const data = {};
+	data[key] = true;
+	await chrome.storage.local.set(data);
 }
 
 export const deleteExceptionUrl = async url => {
@@ -23,6 +25,10 @@ export const deleteExceptionUrl = async url => {
 	await chrome.storage.local.remove(key)
 }
 
+export const getExptionList = async () => {
+	const keys = Object.keys(await chrome.storage.local.get(null));
+	return keys.filter(k => k.indexOf(EXCEPT) == 0).map(k => k.replace(EXCEPT, ''));
+}
 
-const getSingleKey = async key => await chrome.storage.local.get([key])[key];
-const getExceptionKeyFromUrl = url => `except_${new URL(url).hostname}`
+const getSingleKey = async key => (await chrome.storage.local.get([key]))[key];
+const getExceptionKeyFromUrl = url => `${EXCEPT}${new URL(url).origin}`;

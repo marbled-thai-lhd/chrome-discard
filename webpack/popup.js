@@ -12,10 +12,12 @@ module.exports = {
 	name: 'popup',
 	entry: [
 		'./src/popup/popup.js',
+		'./src/popup/popup.css',
 	],
 	output: {
 		path: resolve(__dirname, '../dist/'),
 		filename: 'popup/index.js',
+		clean: true
 	},
 	resolve: {
 		extensions: ['.js', '.ts', '.vue', '.scss', '.css'],
@@ -49,7 +51,7 @@ module.exports = {
 				},
 			},
 			{
-				test: /\.scss$/,
+				test: /\.css$/,
 				use: [{
 						loader: MiniCssExtractPlugin.loader
 					},
