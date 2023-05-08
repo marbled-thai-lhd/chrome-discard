@@ -1,0 +1,230 @@
+.container {
+  width: 180px;
+  height: 100%;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.gearIcon {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  top: -5px;
+}
+
+.gearIcon {
+  -webkit-animation: rotating 2s linear infinite;
+  -moz-animation: rotating 2s linear infinite;
+  -ms-animation: rotating 2s linear infinite;
+  -o-animation: rotating 2s linear infinite;
+  animation: rotating 2s linear infinite;
+}
+
+#startBtn {
+  position: absolute;
+  background-image: url(/images/play.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 12px;
+  height: 12px;
+  top: 14px;
+  left: calc(50% - 4px);
+  transform: rotateY(90deg) rotateX(90deg);
+  transition: all 0.5s;
+}
+
+#stopBtn {
+  position: absolute;
+  background-image: url(/images/stop.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 10px;
+  height: 10px;
+  top: 15px;
+  left: calc(50% - 5px);
+  transition: all 0.5s;
+}
+
+.btnGroup > * {
+  cursor: pointer;
+}
+
+.btnGroup {
+  display: flex;
+  justify-content: center;
+  width: 180px;
+  height: 40px;
+  position: relative;
+}
+
+.btnGroup.stopped #startBtn {
+  transform: rotateY(0) rotateX(0);
+}
+
+.btnGroup.stopped .gearIcon {
+  -webkit-animation: none;
+  -moz-animation: none;
+  -ms-animation: none;
+  -o-animation: none;
+  animation: none;
+}
+
+.btnGroup.stopped #stopBtn {
+  transform: rotateY(90deg) rotateX(90deg);
+}
+
+.message {
+  opacity: 0;
+  top: 1px;
+  position: relative;
+  height: 1px;
+}
+
+.btnGroup.stopped~.message {
+  opacity: 1;
+  text-align: center;
+  transition: all 0.5s;
+  top: 12px;
+  font-size: 20px;
+}
+
+.clickInfo {
+  display: flex;
+  flex-wrap: wrap;
+  opacity: 1;
+  transition: all 0.5s;
+}
+
+.clickInfo>div {
+  padding-left: 10px;
+  flex: 1 0 calc(50% - 10px);
+  justify-content: space-between;
+  font-size: 14px;
+  padding-top: 6px;
+  cursor: pointer;
+  position: relative;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  transition: all 1s;
+  text-align: left;
+}
+
+.btnGroup.stopped ~ .clickInfo .clockIn, 
+.btnGroup.stopped ~ .clickInfo .endBreak {
+  left: -100px;
+  opacity: 0;
+}
+
+.btnGroup.stopped ~ .clickInfo .startBreak, 
+.btnGroup.stopped ~ .clickInfo .clockOut {
+  left: 100px;
+  opacity: 0;
+}
+
+.clockIn::before,
+.startBreak::before,
+.endBreak::before,
+.clockOut::before {
+  position: relative;
+  left: -5px;
+  animation: blinking-green 2s infinite;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+}
+
+.clockIn::before {
+  content: '🕗';
+  
+}
+
+.startBreak::before {
+  content: '🕛';
+}
+
+.endBreak::before {
+  content: '🕐';
+}
+
+.clockOut::before {
+  content: '🕓';
+}
+
+.notWorking {
+  color: red;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 18px;
+  display: none;
+}
+
+.notWorking.show+.btnAction {
+  display: none;
+}
+
+.notWorking.show {
+  display: flex;
+}
+
+.tomorrow::before {
+  content: '☀️';
+}
+.turnoff::before {
+  content: '☁️';
+  background-color: #cb707077;
+  animation: none;
+}
+.syncIcon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 0;
+}
+
+.syncIcon.noSync {
+  filter: invert(57%) sepia(98%) saturate(5809%) hue-rotate(345deg) brightness(103%) contrast(81%);
+}
+
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  to {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blinking-green {
+  0%, 100% {
+    background-color: #70cb96;
+    border-radius: 100%;
+  }
+
+  50% {
+    background-color: #ffffff;
+    border-radius: 0%;
+  }
+}
+
+.clock {
+  position: absolute;
+  left: 5px;
+  cursor: default;
+}
