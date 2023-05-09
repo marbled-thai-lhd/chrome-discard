@@ -1,16 +1,21 @@
 import { TIMER } from "./const";
 import { getTTL } from "./storage";
-import { discardTab } from "./utils";
+import { discardTab, getAllTabs } from "./utils";
 
-export const clearAlarm = async (name) => {
-	return await chrome.alarms.clear(name);
+export const clearTimer = async (tab) => {
+	const key = `${TIMER}${tab.tabId}`;
+	console.log('clear', key)
+	await chrome.alarms.clear(key);
 }
 
-export const clearAllAlarm = async () => {
-	return await chrome.alarms.clearAll();
+export const initTimer = async () => {
+	await chrome.alarms.clearAll();
+	(await getAllTabs()).forEach(startTimer)
 }
 
 export const startTimer = async tab => {
+	if (!tab.tabId) return;
+	
 	const key = `${TIMER}${tab.tabId}`;
 	await chrome.alarms.clear(key);
 	const ttl = await getTTL();
@@ -22,5 +27,6 @@ export const startTimer = async tab => {
 
 export const onAlarmHandle = async alarm => {
 	const tabId = alarm.name.replace(TIMER, '');
-	discardTab(tabId);
+	if (!tabId || tabId == "undefined") return;
+	discardTab(Number(tabId));
 }
