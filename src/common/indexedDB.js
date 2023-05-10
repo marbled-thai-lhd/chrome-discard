@@ -1,26 +1,26 @@
 export const SCHEMA_NAME = 'MagicChicken';
 export const SCREENS_DB_NAME = 'screens';
 
-export const PRIMARY_KEY = ['id', 'sessionId'];
+export const PRIMARY_KEY = ['id'];
 export const PRIMARY_INDEX = 'PK';
 
 class ScreenIndexedDB {
-	constructor(options) {
+	constructor() {
 		this.db = null;
 		this.initialized = false;
 		this.initializedPromise = null;
 
-		this.open(options);
+		this.open();
 	}
 
 	open() {
 		const self = this;
 		this.db && this.db.close();
 
-		const openRequest = indexedDB.open(SCHEMA_NAME);
+		const openRequest = indexedDB.open(SCHEMA_NAME, 2);
 
 		openRequest.onupgradeneeded = e => {
-			const thisDB = e.target.thisDB;
+			const thisDB = e.target.result;
 
 			if (!thisDB.objectStoreNames.contains(SCREENS_DB_NAME)) {
 				thisDB.createObjectStore(SCREENS_DB_NAME, {
@@ -77,7 +77,7 @@ class ScreenIndexedDB {
 				const resultsRowsArray = [];
 
 				cursor.onsuccess = e => {
-					const result = e.target;
+					const result = e.target.result;
 					if (!result) return callback(resultsRowsArray);
 
 					resultsRowsArray.push(result.value);
@@ -88,33 +88,33 @@ class ScreenIndexedDB {
 			});
 	};
 
-	getByPrimaryIndex(query, callback) {
+	getByPrimaryIndex(params, callback) {
 		this.getTransaction('readonly')
 			.then(transaction => {
 				const store = transaction.objectStore(SCREENS_DB_NAME);
-				const request = store.index(PRIMARY_INDEX).get(IDBKeyRange.only(query.params));
+				const request = store.index(PRIMARY_INDEX).get(IDBKeyRange.only(params));
 
 				request.onsuccess = e => callback(e.target.result);
 				request.onerror = () => callback()
 			});
 	};
 
-	delete(query) {
+	delete(params) {
 		this.getTransaction('readwrite')
 			.then(transaction => {
 				const store = transaction.objectStore(SCREENS_DB_NAME);
-				const request = store.index(query.IDB.index).get(IDBKeyRange.only(query.params));
+				const request = store.index(PRIMARY_INDEX).get(IDBKeyRange.only(params));
 
 				request.onsuccess = e => {
 					const result = e.target.result;
-					result && store.delete([result.id, result.sessionId]);
+					result && store.delete([result.id]);
 				};
 			});
 	};
 
-	insertOrUpdate(data, key) {
+	insertOrUpdate(data) {
 		this.getTransaction('readwrite')
-			.then(tx => tx.objectStore(SCREENS_DB_NAME).put(data, key));
+			.then(tx => tx.objectStore(SCREENS_DB_NAME).put(data));
 	};
 
 }

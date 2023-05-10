@@ -1,16 +1,19 @@
 import { updateLabel } from "./display"
 import { clearTimer, onAlarmHandle, startTimer } from "./timer";
-import { discardAllTab } from "./utils"
+import { discardAllTab, saveTabPicture } from "./utils"
 
 let previousActiveTab = null;
 export const initEvent = () => {
 	chrome.tabs.onUpdated.addListener(updateLabel);
 	chrome.tabs.onReplaced.addListener(updateLabel);
+
 	chrome.tabs.onActivated.addListener(async tab => {
 		await clearTimer(tab);
 		previousActiveTab && startTimer(previousActiveTab);
 		previousActiveTab = tab;
+		saveTabPicture(tab);
 	});
+
 	chrome.tabs.onRemoved.addListener(async tab => {
 		if (previousActiveTab.tabId == tab) {
 			previousActiveTab = undefined;
