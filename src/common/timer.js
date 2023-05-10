@@ -4,7 +4,6 @@ import { discardTab, getAllTabs } from "./utils";
 
 export const clearTimer = async (tab) => {
 	const key = `${TIMER}${tab.tabId}`;
-	console.log('clear', key)
 	await chrome.alarms.clear(key);
 }
 
