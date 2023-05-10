@@ -4,6 +4,9 @@ import { getCurrentTab } from "@/common/utils";
 
 const initButton = () => {
 	document.getElementById('addExeptions').onclick = addExeptions;
+	document.getElementById('managePage').onclick = () => {
+		window.open(chrome.runtime.getURL('manage/index.html'))
+	};
 }
 
 const removeUrl = async url => {

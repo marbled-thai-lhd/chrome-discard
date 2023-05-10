@@ -12,6 +12,9 @@
       "128": "assets/icons/stopped-128.png"
     }
   },
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "permissions": ["alarms", "storage", "tabs"],
   "background": {
     "service_worker": "background/main.js"
