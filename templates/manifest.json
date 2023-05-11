@@ -15,7 +15,7 @@
   "host_permissions": [
     "<all_urls>"
   ],
-  "permissions": ["alarms", "storage", "tabs"],
+  "permissions": ["alarms", "storage", "tabs", "activeTab", "tabGroups"],
   "background": {
     "service_worker": "background/main.js"
   },
