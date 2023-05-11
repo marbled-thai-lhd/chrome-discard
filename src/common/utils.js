@@ -33,7 +33,7 @@ export const saveTabPicture = async tab => {
 
 export const _saveTabPicture = async tab => {
 	const tabInfo = await chrome.tabs.get(tab.tabId);
-
+	// console.log("_saveTabPicture", tabInfo.active, tabInfo.active, tabInfo.status)
 	if (!tabInfo.active) return;
 	if (!tabInfo.status || tab.status == 'loading') return;
 	const image = await chrome.tabs.captureVisibleTab(tab.windowId);

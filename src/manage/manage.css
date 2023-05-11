@@ -32,10 +32,6 @@ body code.title {
 	cursor: pointer;
 }
 
-.tile-group .tile .content {
-	margin-bottom: 20px;
-}
-
 .tile-group .tile .content .title {
 	position: relative;
 	font-size: 1.2em;
@@ -44,25 +40,9 @@ body code.title {
 	letter-spacing: 2px;
 }
 
-.tile-group .tile .content .msg {
-	position: absolute;
-	top: 250px;
-	left: 0;
-	width: 100%;
-	transition: top 150ms;
-	font-family: monospace;
-	font-size: 0.8em;
-}
-
-.tile-group .tile .content {
-	position: relative;
-}
-
 .tile-group .tile .review {
-	position: absolute;
-	top: 0;
-	left: 0;
 	width: 100%;
 	height: 100%;
 	display: block;
+	object-fit: fill
 }
