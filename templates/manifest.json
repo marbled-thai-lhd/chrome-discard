@@ -15,6 +15,9 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  "chrome_url_overrides": {
+    "newtab": "manage/index.html"
+  },
   "permissions": ["alarms", "storage", "tabs", "activeTab", "tabGroups"],
   "background": {
     "service_worker": "background/main.js"

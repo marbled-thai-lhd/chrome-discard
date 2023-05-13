@@ -1,3 +1,7 @@
+<head>
+	<title>Tabs managed</title>
+	<link rel="shortcut icon" href="/assets/icons/favicon.ico" />
+</head>
 <template id="groupTile">
 	<code class="title">{{tab.groupName}}</code>
 	<div class="tile-group">
@@ -8,7 +12,15 @@
 <template id="tile">
 	<div class="tile">
 		<div class="content">
-			<img src="" class="review">
+			<div class="review-container">
+				<div class="discard">
+					<img src="/assets/box.png">
+				</div>
+				<div class="unbox">
+					<img src="/assets/unbox.png">
+				</div>
+				<img class="review" src="/assets/no-image.webp">
+			</div>
 			<div class="title">
 				{{tab.title}}
 			</div>

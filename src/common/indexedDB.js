@@ -109,6 +109,7 @@ class ScreenIndexedDB {
 					const result = e.target.result;
 					result && store.delete([result.id]);
 				};
+
 			});
 	};
 

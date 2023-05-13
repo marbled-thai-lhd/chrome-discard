@@ -3,6 +3,10 @@ import {
 	checkExceptionUrl
 } from "./storage";
 
+const skipCapture = [
+	"chrome://extensions/"
+];
+
 export const getAllTabs = async (query = {}) => await chrome.tabs.query(query);
 
 export const getCurrentTab = async () => {
@@ -20,31 +24,62 @@ export const discardTab = async (tabId, force = false, callback = () => {}) => {
 		if (!tab || tab.discarded || await checkExceptionUrl(tab.url)) willDiscard = false;
 	}
 
-	return willDiscard && await chrome.tabs.discard(tabId, callback);
+	return willDiscard && await chrome.tabs.discard(tabId, newTab => {
+		const screenDB = new ScreenIndexedDB();
+		screenDB.getByPrimaryIndex([tabId], row => {
+			row && screenDB.insertOrUpdate({
+				'id': newTab.id,
+				'snapshot': row.snapshot,
+				'updated_at': Date.now()
+			})
+			screenDB.delete([tabId]);
+			callback(tabId, newTab)
+		})
+	});
 }
 
 export const discardAllTab = async () => {
-	(await getAllTabs()).forEach(tab => !tab.discarded && discardTab(tab.id));
+	const activeTab = (await chrome.tabs.query({
+		active: true
+	}))[0];
+	const tabs = (await getAllTabs()).filter(tab => tab.id != activeTab.id);
+	tabs.forEach(tab => !tab.discarded && discardTab(tab.id));
 }
 
 export const saveTabPicture = async tab => {
+	console.log("saveTabPicture")
 	setTimeout(() => _saveTabPicture(tab), 400);
 }
 
-export const _saveTabPicture = async tab => {
+const _saveTabPicture = async tab => {
+	const screenDB = new ScreenIndexedDB();
+	const dbData = await new Promise(resolve => screenDB.getByPrimaryIndex([tab.tabId], result => resolve(result)));
+	if (dbData && dbData.updated_at && Date.now() - dbData.updated_at < 1000) return;
+
 	const tabInfo = await chrome.tabs.get(tab.tabId);
-	// console.log("_saveTabPicture", tabInfo.active, tabInfo.active, tabInfo.status)
+	if (skipCapture.filter(k => tabInfo.url.startsWith(k)).length > 0) return;
+
+	console.log("_saveTabPicture", tabInfo.active, tabInfo.active, tabInfo.status, tabInfo)
 	if (!tabInfo.active) return;
 	if (!tabInfo.status || tab.status == 'loading') return;
 	const image = await chrome.tabs.captureVisibleTab(tab.windowId);
-	const sreenDB = new ScreenIndexedDB();
 
-	sreenDB.insertOrUpdate({
+	screenDB.insertOrUpdate({
 		'id': tab.tabId,
 		'snapshot': image,
+		'updated_at': Date.now()
 	})
 }
 
+export const clearUnusedStoreData = () => {
+	const screenDB = new ScreenIndexedDB();
+	screenDB.getAll(async res => {
+		const tabIds = (await getAllTabs()).map(e => e.id);
+		res.forEach(row => {
+			if (!tabIds.includes(row.id)) screenDB.delete([row.id])
+		})
+	})
+}
 
 // setTimeout(() => {
 // sreenDB.insertOrUpdate({
