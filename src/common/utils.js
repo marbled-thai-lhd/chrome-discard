@@ -4,7 +4,7 @@ import {
 } from "./storage";
 
 const skipCapture = [
-	"chrome://extensions/"
+	"chrome://"
 ];
 
 export const getAllTabs = async (query = {}) => await chrome.tabs.query(query);

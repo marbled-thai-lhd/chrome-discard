@@ -5,23 +5,24 @@ import { clearUnusedStoreData, discardAllTab, saveTabPicture } from "./utils"
 let previousActiveTab = null;
 export const initEvent = () => {
 	chrome.tabs.onUpdated.addListener((tab, what) => {
-		if (what.status != 'complete') return;
+		console.log("onUpdated", what.status)
 
-		console.log("onUpdated")
+		if (what.status != 'complete') return;
 		updateLabel();
 		saveTabPicture({tabId: tab});
 	});
 	chrome.tabs.onReplaced.addListener(updateLabel);
 
 	chrome.tabs.onActivated.addListener(async tab => {
+		console.log("onActivated")
 		await clearTimer(tab);
 		previousActiveTab && startTimer(previousActiveTab);
 		previousActiveTab = tab;
-		console.log("onActivated")
 		saveTabPicture(tab);
 	});
 
 	chrome.tabs.onRemoved.addListener(async tab => {
+		console.log("onRemoved")
 		if (previousActiveTab.tabId == tab) {
 			previousActiveTab = undefined;
 		}

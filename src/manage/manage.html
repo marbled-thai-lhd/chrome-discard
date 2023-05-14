@@ -3,9 +3,10 @@
 	<link rel="shortcut icon" href="/assets/icons/favicon.ico" />
 </head>
 <template id="groupTile">
-	<code class="title">{{tab.groupName}}</code>
-	<div class="tile-group">
-
+	<div class="group-tile">
+		<code class="title">{{tab.groupName}}</code>
+		<div class="tile-group">
+		</div>
 	</div>
 </template>
 
@@ -13,21 +14,21 @@
 	<div class="tile">
 		<div class="content">
 			<div class="review-container">
-				<div class="discard">
+				<div class="discarded">
 					<img src="/assets/box.png">
-				</div>
-				<div class="unbox">
-					<img src="/assets/unbox.png">
 				</div>
 				<img class="review" src="/assets/no-image.webp">
 			</div>
-			<div class="title">
-				{{tab.title}}
+			<div class="title-container">
+				<span class="unbox">
+					<img src="/assets/box.png">
+				</span>
+				<span class="title">{{tab.title}}</span>
 			</div>
 		</div>
 	</div>
 </template>
 
 <div id="tab-container">
-	
+
 </div>
