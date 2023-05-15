@@ -50,7 +50,6 @@ const onUpdated = (tab, what) => {
 	saveTabPicture({
 		tabId: tab
 	});
-	numberOfTabsLimitter();
 }
 
 const onRemoved = async tab => {
@@ -63,5 +62,4 @@ const onRemoved = async tab => {
 	})
 	updateLabel();
 	clearUnusedStoreData();
-	numberOfTabsLimitter();
 }

@@ -52,7 +52,6 @@ export const discardAllTab = async () => {
 }
 
 export const saveTabPicture = async tab => {
-	console.log("saveTabPicture")
 	setTimeout(() => _saveTabPicture(tab), 400);
 }
 
@@ -64,7 +63,6 @@ const _saveTabPicture = async tab => {
 	const tabInfo = await chrome.tabs.get(tab.tabId);
 	if (skipCapture.filter(k => tabInfo.url.startsWith(k)).length > 0) return;
 
-	console.log("_saveTabPicture", tabInfo.active, tabInfo.active, tabInfo.status, tabInfo)
 	if (!tabInfo.active) return;
 	if (!tabInfo.status || tab.status == 'loading') return;
 	const image = await chrome.tabs.captureVisibleTab(tab.windowId);
@@ -88,17 +86,26 @@ export const clearUnusedStoreData = () => {
 
 export const numberOfTabsLimitter = async () => {
 	const limit = Number(await getSingleKey(MAX_ALLOW_RUNNING)) || DEFAULT_MAX_ALLOW_RUNNING;
-	const runningTab = (await getAllTabs())
+	let runningTab = (await getAllTabs())
 		.filter(tabInfo => !tabInfo.discarded)
 		.filter(tabInfo => skipCapture.filter(k => tabInfo.url.startsWith(k)).length == 0)
-		.filter(async tabInfo => tabInfo.url && !(await checkExceptionUrl(tabInfo.url)))
 		.sort((a, b) => a.id - b.id);
 
-	console.log(runningTab)
-	if (runningTab.length <= limit) return;
-	for (let index = 0; index < runningTab.length - limit ; index++) {
-		discardTab(runningTab[index].id, true);
-	}
+	const promises = runningTab.map(tabInfo => {
+		return new Promise(async resolve => {
+			tabInfo.include = tabInfo.url && !(await checkExceptionUrl(tabInfo.url));
+			resolve()
+		})
+	})
+
+	Promise.all(promises).then(() => {
+		runningTab = runningTab.filter(e => e.include);
+		if (runningTab.length <= limit) return;
+		console.log(runningTab, limit)
+		for (let index = 0; index < runningTab.length - limit; index++) {
+			discardTab(runningTab[index].id, true);
+		}
+	})
 }
 // setTimeout(() => {
 // sreenDB.insertOrUpdate({
