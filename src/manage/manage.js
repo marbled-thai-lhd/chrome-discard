@@ -1,4 +1,6 @@
+import { TIMER } from "@/common/const";
 import ScreenIndexedDB from "@/common/indexedDB";
+import { clearTimer } from "@/common/timer";
 import {
 	discardTab,
 	getAllTabs
@@ -7,6 +9,8 @@ import {
 const screenDB = new ScreenIndexedDB();
 let activeTab = null;
 const display = async () => {
+	[...document.querySelectorAll('[data-ttl]')].forEach(e => clearInterval(e.dataset.ttl));
+
 	const tabContainerDOM = document.getElementById('tab-container');
 	tabContainerDOM.innerHTML = '';
 	activeTab = (await chrome.tabs.query({
@@ -27,7 +31,7 @@ const display = async () => {
 		const recentTabs = results.filter(e => tabIds.includes(e.id)).sort((b, a) => a.updated_at - b.updated_at).slice(0, 5);
 
 		const groupDOM = document.getElementById('groupTile').content.cloneNode(true);
-		groupDOM.id = -1;
+		groupDOM.id = 0;
 		groupDOM.querySelector('.title').innerText = 'Recent';
 		groupDOM.querySelector('.group-tile').style.order = -1;
 		
@@ -62,7 +66,7 @@ const displayGroup = async (tabs, tabContainerDOM, index) => {
 
 const displayTab = (tab, groupDOM) => {
 	return new Promise(resolve => {
-		screenDB.getByPrimaryIndex([tab.id], row => {
+		screenDB.getByPrimaryIndex([tab.id], async row => {
 			const tabDOM = document.getElementById('tile').content.cloneNode(true);
 
 			const tile = tabDOM.querySelector('.tile');
@@ -70,10 +74,22 @@ const displayTab = (tab, groupDOM) => {
 			tile.id = tab.id + '|' + (row && row.updated_at);
 			tabDOM.querySelector('.title').innerText = tab.title;
 			if (!tab.discarded) {
+				const ttl = tabDOM.querySelector('.ttl');
+				ttl.id = `${groupDOM.id}|${tab.id}|ttl`;
+				const timer = await chrome.alarms.get(`${TIMER}${tab.id}`);
+				ttl.dataset.ttl = setInterval(() => {
+					const totalSeconds = timer ? Math.floor((timer.scheduledTime - Date.now()) / 1000) : 0;
+					const second = totalSeconds % 60;
+					const minute = Math.floor(totalSeconds / 60);
+					document.getElementById(ttl.id).innerHTML = `(${minute}:${second.toString().padStart(2, '0')})`;
+				}, 1000);
+
 				tabDOM.querySelector('.discarded').remove();
 				tabDOM.querySelector('.unbox').onclick = () => {
 					discardTab(tab.id, true);
+					clearTimer({tabId: tab.id})
 					display();
+					clearInterval(ttl.dataset.ttl);
 				};
 			} else {
 				tabDOM.querySelector('.unbox').remove();
@@ -94,23 +110,25 @@ const displayTab = (tab, groupDOM) => {
 	})
 }
 
-const checkNeedToReDraw = async () => {
+const checkNeedToReDraw = async (cb) => {
 	if (!activeTab) return;
 
-	const drawedIds = [...document.querySelectorAll('.tile')].map(e => e.id);
+	let drawedIds = [...document.querySelectorAll('.tile')].map(e => e.id);
+	drawedIds = Array.from(new Set(drawedIds));
+
 	const tabIds = (await getAllTabs()).filter(tab => tab.id != activeTab.id).map(e => e.id);
 	screenDB.getAll(results => {
 		const storeIds = results.filter(row => tabIds.includes(row.id)).map(row => {
-			return row.id.id + '|' + row.updated_at
+			return row.id + '|' + row.updated_at
 		});
 
 		const difference = drawedIds
 			.filter(x => !storeIds.includes(x))
 			.concat(storeIds.filter(x => !drawedIds.includes(x)));
 		
-		console.log(tabIds, difference)
+		cb(difference.length > 0);
 	})
 }
 
 display();
-window.onfocus = () => checkNeedToReDraw();
+window.onfocus = () => checkNeedToReDraw(res => res && display());

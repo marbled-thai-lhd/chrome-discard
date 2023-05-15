@@ -85,3 +85,7 @@ body code.title {
 	width: 48px;
 	height: 48px;
 }
+.ttl {
+	position: relative;
+	top: -4px;
+}
