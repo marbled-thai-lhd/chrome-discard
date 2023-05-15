@@ -78,7 +78,9 @@ const displayTab = (tab, groupDOM) => {
 				ttl.id = `${groupDOM.id}|${tab.id}|ttl`;
 				const timer = await chrome.alarms.get(`${TIMER}${tab.id}`);
 				ttl.dataset.ttl = setInterval(() => {
-					const totalSeconds = timer ? Math.floor((timer.scheduledTime - Date.now()) / 1000) : 0;
+					if (!timer) return document.getElementById(ttl.id).innerHTML = '';
+					const totalSeconds = Math.floor((timer.scheduledTime - Date.now()) / 1000);
+					if (totalSeconds <= 0) return display();
 					const second = totalSeconds % 60;
 					const minute = Math.floor(totalSeconds / 60);
 					document.getElementById(ttl.id).innerHTML = `(${minute}:${second.toString().padStart(2, '0')})`;
@@ -131,4 +133,9 @@ const checkNeedToReDraw = async (cb) => {
 }
 
 display();
-window.onfocus = () => checkNeedToReDraw(res => res && display());
+window.onfocus = () => {
+	if (!window.render || Date.now() - window.render > 1000) {
+		checkNeedToReDraw(res => res && display())
+	}
+	window.render = Date.now();
+};

@@ -1,36 +1,26 @@
-import { updateLabel } from "./display"
-import { clearTimer, onAlarmHandle, startTimer } from "./timer";
-import { clearUnusedStoreData, discardAllTab, saveTabPicture } from "./utils"
+import {
+	updateLabel
+} from "./display"
+import {
+	clearTimer,
+	onAlarmHandle,
+	startTimer
+} from "./timer";
+import {
+	clearUnusedStoreData,
+	discardAllTab,
+	saveTabPicture
+} from "./utils"
 
 let previousActiveTab = null;
 export const initEvent = () => {
-	chrome.tabs.onUpdated.addListener((tab, what) => {
-		console.log("onUpdated", what.status)
-
-		if (what.status != 'complete') return;
-		updateLabel();
-		saveTabPicture({tabId: tab});
-	});
+	chrome.tabs.onUpdated.addListener(onUpdated);
 	chrome.tabs.onReplaced.addListener(updateLabel);
-
-	chrome.tabs.onActivated.addListener(async tab => {
-		console.log("onActivated")
-		await clearTimer(tab);
-		previousActiveTab && startTimer(previousActiveTab);
-		previousActiveTab = tab;
-		saveTabPicture(tab);
-	});
-
-	chrome.tabs.onRemoved.addListener(async tab => {
-		console.log("onRemoved")
-		if (previousActiveTab.tabId == tab) {
-			previousActiveTab = undefined;
-		}
-		await clearTimer({tabId: tab})
-		updateLabel();
-		clearUnusedStoreData();
-	})
+	chrome.tabs.onActivated.addListener(onActivated);
+	chrome.tabs.onRemoved.addListener(onRemoved)
 	chrome.alarms.onAlarm.addListener(onAlarmHandle);
+	
+	setInterval(() => console.log('hasListener', chrome.tabs.onActivated.hasListener(onActivated)), 5000);
 }
 
 export const initCommand = () => {
@@ -39,4 +29,34 @@ export const initCommand = () => {
 			return discardAllTab();
 		}
 	});
+}
+
+const onActivated = async tab => {
+	console.log("onActivated")
+	await clearTimer(tab);
+	previousActiveTab && startTimer(previousActiveTab);
+	previousActiveTab = tab;
+	saveTabPicture(tab);
+}
+
+const onUpdated = (tab, what) => {
+	console.log("onUpdated", what.status)
+
+	if (what.status != 'complete') return;
+	updateLabel();
+	saveTabPicture({
+		tabId: tab
+	});
+}
+
+const onRemoved = async tab => {
+	console.log("onRemoved")
+	if (previousActiveTab.tabId == tab) {
+		previousActiveTab = undefined;
+	}
+	await clearTimer({
+		tabId: tab
+	})
+	updateLabel();
+	clearUnusedStoreData();
 }
