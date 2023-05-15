@@ -9,6 +9,7 @@ import {
 import {
 	clearUnusedStoreData,
 	discardAllTab,
+	numberOfTabsLimitter,
 	saveTabPicture
 } from "./utils"
 
@@ -33,10 +34,12 @@ export const initCommand = () => {
 
 const onActivated = async tab => {
 	console.log("onActivated")
+	updateLabel();
 	await clearTimer(tab);
 	previousActiveTab && startTimer(previousActiveTab);
 	previousActiveTab = tab;
 	saveTabPicture(tab);
+	numberOfTabsLimitter();
 }
 
 const onUpdated = (tab, what) => {
@@ -47,11 +50,12 @@ const onUpdated = (tab, what) => {
 	saveTabPicture({
 		tabId: tab
 	});
+	numberOfTabsLimitter();
 }
 
 const onRemoved = async tab => {
 	console.log("onRemoved")
-	if (previousActiveTab.tabId == tab) {
+	if (previousActiveTab && previousActiveTab.tabId == tab) {
 		previousActiveTab = undefined;
 	}
 	await clearTimer({
@@ -59,4 +63,5 @@ const onRemoved = async tab => {
 	})
 	updateLabel();
 	clearUnusedStoreData();
+	numberOfTabsLimitter();
 }

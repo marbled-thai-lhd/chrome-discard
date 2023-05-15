@@ -31,8 +31,11 @@ export const getExptionList = async () => {
 }
 
 export const getTTL = async () => {
-	return (await getSingleKey(SETTING_TTL)) || DEFAULT_SETTING_TTL;
+	return ((await getSingleKey(SETTING_TTL)) || DEFAULT_SETTING_TTL) * 60000;
 }
 
-const getSingleKey = async key => (await chrome.storage.local.get([key]))[key];
-const getExceptionKeyFromUrl = url => `${EXCEPT}${new URL(url).origin}`;
+export const getSingleKey = async key => (await chrome.storage.local.get([key]))[key];
+const getExceptionKeyFromUrl = url => {
+	console.log(url)
+	return `${EXCEPT}${new URL(url).origin}`;
+}

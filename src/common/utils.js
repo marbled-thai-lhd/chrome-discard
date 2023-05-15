@@ -1,6 +1,11 @@
+import {
+	DEFAULT_MAX_ALLOW_RUNNING,
+	MAX_ALLOW_RUNNING
+} from "./const";
 import ScreenIndexedDB from "./indexedDB";
 import {
-	checkExceptionUrl
+	checkExceptionUrl,
+	getSingleKey
 } from "./storage";
 
 const skipCapture = [
@@ -26,7 +31,7 @@ export const discardTab = async (tabId, force = false, callback = () => {}) => {
 
 	return willDiscard && await chrome.tabs.discard(tabId, newTab => {
 		const screenDB = new ScreenIndexedDB();
-		screenDB.getByPrimaryIndex([tabId], row => {
+		newTab && screenDB.getByPrimaryIndex([tabId], row => {
 			row && screenDB.insertOrUpdate({
 				'id': newTab.id,
 				'snapshot': row.snapshot,
@@ -81,6 +86,20 @@ export const clearUnusedStoreData = () => {
 	})
 }
 
+export const numberOfTabsLimitter = async () => {
+	const limit = Number(await getSingleKey(MAX_ALLOW_RUNNING)) || DEFAULT_MAX_ALLOW_RUNNING;
+	const runningTab = (await getAllTabs())
+		.filter(tabInfo => !tabInfo.discarded)
+		.filter(tabInfo => skipCapture.filter(k => tabInfo.url.startsWith(k)).length == 0)
+		.filter(async tabInfo => tabInfo.url && !(await checkExceptionUrl(tabInfo.url)))
+		.sort((a, b) => a.id - b.id);
+
+	console.log(runningTab)
+	if (runningTab.length <= limit) return;
+	for (let index = 0; index < runningTab.length - limit ; index++) {
+		discardTab(runningTab[index].id, true);
+	}
+}
 // setTimeout(() => {
 // sreenDB.insertOrUpdate({
 // 	'id': 1,
