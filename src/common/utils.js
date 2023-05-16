@@ -7,6 +7,7 @@ import {
 	checkExceptionUrl,
 	getSingleKey
 } from "./storage";
+import { clearTimer } from "./timer";
 
 const skipCapture = [
 	"chrome://"
@@ -30,6 +31,7 @@ export const discardTab = async (tabId, force = false, callback = () => {}) => {
 	}
 
 	return willDiscard && await chrome.tabs.discard(tabId, newTab => {
+		clearTimer({tabId})
 		const screenDB = new ScreenIndexedDB();
 		newTab && screenDB.getByPrimaryIndex([tabId], row => {
 			row && screenDB.insertOrUpdate({
