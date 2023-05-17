@@ -15,13 +15,20 @@ import {
 
 let previousActiveTab = null;
 export const initEvent = () => {
+	chrome.tabs.onUpdated.removeListener();
 	chrome.tabs.onUpdated.addListener(onUpdated);
+
+	chrome.tabs.onReplaced.removeListener();
 	chrome.tabs.onReplaced.addListener(updateLabel);
+
+	chrome.tabs.onActivated.removeListener();
 	chrome.tabs.onActivated.addListener(onActivated);
+
+	chrome.tabs.onRemoved.removeListener();
 	chrome.tabs.onRemoved.addListener(onRemoved)
+
+	chrome.alarms.onAlarm.removeListener();
 	chrome.alarms.onAlarm.addListener(onAlarmHandle);
-	
-	setInterval(() => console.log('hasListener', chrome.tabs.onActivated.hasListener(onActivated)), 5000);
 }
 
 export const initCommand = () => {

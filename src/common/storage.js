@@ -36,5 +36,6 @@ export const getTTL = async () => {
 
 export const getSingleKey = async key => (await chrome.storage.local.get([key]))[key];
 const getExceptionKeyFromUrl = url => {
-	return `${EXCEPT}${new URL(url).origin}`;
+	let urlObj = new URL(url);
+	return `${EXCEPT}${urlObj.origin}${urlObj.pathname}`;
 }
