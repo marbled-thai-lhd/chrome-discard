@@ -25,5 +25,3 @@ const addExeptions = async () => {
 }
 
 initButton();
-
-window.onfocus = () => display()
