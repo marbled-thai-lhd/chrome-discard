@@ -26,7 +26,13 @@ body code.title {
 	gap: 5vw;
 }
 
+.tile-group.recent {
+	flex-wrap: nowrap;
+	overflow-x: auto;
+}
+
 .tile-group .tile {
+	flex-shrink: 0;
 	width: 20vw;
 }
 
@@ -41,7 +47,6 @@ body code.title {
 
 .tile-group .tile .review {
 	width: 100%;
-	height: 100%;
 	display: block;
 	object-fit: fill;
 	aspect-ratio: 18/9;

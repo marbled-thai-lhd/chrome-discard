@@ -1,5 +1,5 @@
 import { TIMER } from "./const";
-import { getTTL } from "./storage";
+import { checkExceptionUrl, getTTL } from "./storage";
 import { discardTab, getAllTabs } from "./utils";
 
 export const clearTimer = async (tab) => {
@@ -9,7 +9,14 @@ export const clearTimer = async (tab) => {
 
 export const initTimer = async () => {
 	await chrome.alarms.clearAll();
-	(await getAllTabs()).forEach(startTimer)
+	(await getAllTabs()).forEach(async e => {
+		if (e.discarded) return;
+		if (await checkExceptionUrl(e.url)) return;
+
+		startTimer({
+			tabId: e.id
+		});
+	})
 }
 
 export const startTimer = async tab => {

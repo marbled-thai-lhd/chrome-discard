@@ -1,6 +1,8 @@
+import { ACTIVATED } from "./const";
 import {
 	updateLabel
 } from "./display"
+import { getSingleKey } from "./storage";
 import {
 	clearTimer,
 	onAlarmHandle,
@@ -41,9 +43,10 @@ export const initCommand = () => {
 
 const onActivated = async tab => {
 	console.log("onActivated")
+	const activated = await getSingleKey(ACTIVATED);
 	updateLabel();
 	await clearTimer(tab);
-	previousActiveTab && startTimer(previousActiveTab);
+	previousActiveTab && activated && startTimer(previousActiveTab);
 	previousActiveTab = tab;
 	saveTabPicture(tab);
 	numberOfTabsLimitter();

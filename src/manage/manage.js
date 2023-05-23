@@ -1,7 +1,9 @@
-import { TIMER } from "@/common/const";
+import { ACTIVATED, TIMER } from "@/common/const";
 import ScreenIndexedDB from "@/common/indexedDB";
-import { clearTimer } from "@/common/timer";
+import { getSingleKey } from "@/common/storage";
+import { clearTimer, initTimer } from "@/common/timer";
 import {
+	discardAllTab,
 	discardTab,
 	getAllTabs
 } from "@/common/utils";
@@ -9,6 +11,9 @@ import {
 const screenDB = new ScreenIndexedDB();
 let activeTab = null;
 const display = async () => {
+	const activated = await getSingleKey(ACTIVATED);
+	document.getElementById('startStop').innerText = activated ? 'Stop It' : 'Start It';
+
 	[...document.querySelectorAll('[data-ttl]')].forEach(e => clearInterval(e.dataset.ttl));
 
 	const tabContainerDOM = document.getElementById('tab-container');
@@ -32,8 +37,9 @@ const display = async () => {
 
 		const groupDOM = document.getElementById('groupTile').content.cloneNode(true);
 		groupDOM.id = 0;
-		groupDOM.querySelector('.title').innerText = 'Recent';
+		groupDOM.querySelector('.tile-group').classList.add('recent');
 		groupDOM.querySelector('.group-tile').style.order = -1;
+		groupDOM.querySelector('.title').innerText = 'Recent';
 		
 		const promises = recentTabs.map((tab, index) => {
 			tab = {
@@ -139,3 +145,19 @@ window.onfocus = () => {
 	}
 	window.render = Date.now();
 };
+
+document.getElementById('closeAll').onclick = async () => {
+	await discardAllTab();
+	setTimeout(() => display(), 100);
+}
+
+document.getElementById('startStop').onclick = async () => {
+	const activated = await getSingleKey(ACTIVATED);
+	if (activated) await chrome.alarms.clearAll();
+	else await initTimer();
+
+	const updateData = {};
+	updateData[ACTIVATED] = !activated;
+	await chrome.storage.local.set(updateData);
+	setTimeout(() => display(), 100);
+}
