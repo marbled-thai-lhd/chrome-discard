@@ -5,7 +5,11 @@ import { getCurrentTab } from "@/common/utils";
 
 const initButton = () => {
 	document.getElementById('addExeptions').onclick = addExeptions;
-	document.getElementById('initEvents').onclick = () => initEvent() && initTimer();
+	document.getElementById('initEvents').onclick = () => {
+		chrome.runtime.sendMessage({
+			type: "initEvents",
+		});
+	};
 	document.getElementById('settingPage').onclick = () => {
 		window.open(chrome.runtime.getURL('setting/index.html'))
 	};

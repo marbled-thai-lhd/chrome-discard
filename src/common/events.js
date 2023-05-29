@@ -5,6 +5,7 @@ import {
 import { getSingleKey } from "./storage";
 import {
 	clearTimer,
+	initTimer,
 	onAlarmHandle,
 	startTimer
 } from "./timer";
@@ -17,6 +18,7 @@ import {
 
 let previousActiveTab = null;
 export const initEvent = () => {
+	console.log('initEvent');
 	chrome.tabs.onUpdated.removeListener();
 	chrome.tabs.onUpdated.addListener(onUpdated);
 
@@ -31,6 +33,18 @@ export const initEvent = () => {
 
 	chrome.alarms.onAlarm.removeListener();
 	chrome.alarms.onAlarm.addListener(onAlarmHandle);
+}
+
+export const initMessageListener = () => {
+	chrome.runtime.onMessage.addListener(request => {
+		if (request.type == 'initTimer') {
+			if (request.value) return initTimer();
+			chrome.alarms.clearAll();
+		}
+		if (request.type == 'initEvents') {
+			initEvent();
+		}
+	});
 }
 
 export const initCommand = () => {

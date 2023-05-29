@@ -153,11 +153,13 @@ document.getElementById('closeAll').onclick = async () => {
 
 document.getElementById('startStop').onclick = async () => {
 	const activated = await getSingleKey(ACTIVATED);
-	if (activated) await chrome.alarms.clearAll();
-	else await initTimer();
 
 	const updateData = {};
 	updateData[ACTIVATED] = !activated;
 	await chrome.storage.local.set(updateData);
 	setTimeout(() => display(), 100);
+	chrome.runtime.sendMessage({
+		type: "initTimer",
+		value: updateData[ACTIVATED]
+	});
 }

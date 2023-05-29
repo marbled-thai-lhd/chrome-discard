@@ -1,6 +1,7 @@
 import {
 	initCommand,
-	initEvent
+	initEvent,
+	initMessageListener
 } from "@/common/events";
 import {
 	initStorage
@@ -10,4 +11,5 @@ chrome.runtime.onInstalled.addListener(() => {
 	initEvent();
 	initStorage();
 	initCommand();
+	initMessageListener();
 })
