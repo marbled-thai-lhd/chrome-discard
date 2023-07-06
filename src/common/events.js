@@ -33,6 +33,8 @@ export const initEvent = () => {
 
 	chrome.alarms.onAlarm.removeListener();
 	chrome.alarms.onAlarm.addListener(onAlarmHandle);
+
+	setTimeout(initEvent, 60 * 60 * 1000);
 }
 
 export const initMessageListener = () => {
@@ -41,9 +43,9 @@ export const initMessageListener = () => {
 			if (request.value) return initTimer();
 			chrome.alarms.clearAll();
 		}
-		if (request.type == 'initEvents') {
-			initEvent();
-		}
+		// if (request.type == 'initEvents') {
+		// 	initEvent();
+		// }
 	});
 }
 

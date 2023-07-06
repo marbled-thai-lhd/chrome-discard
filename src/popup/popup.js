@@ -1,15 +1,8 @@
-import { initEvent } from "@/common/events";
-import { deleteExceptionUrl } from "@/common/storage";
-import { getExptionList, setExceptionUrl } from "@/common/storage";
+import { setExceptionUrl } from "@/common/storage";
 import { getCurrentTab } from "@/common/utils";
 
 const initButton = () => {
 	document.getElementById('addExeptions').onclick = addExeptions;
-	document.getElementById('initEvents').onclick = () => {
-		chrome.runtime.sendMessage({
-			type: "initEvents",
-		});
-	};
 	document.getElementById('settingPage').onclick = () => {
 		window.open(chrome.runtime.getURL('setting/index.html'))
 	};

@@ -1,18 +1,22 @@
 import { ACTIVATED, TIMER } from "@/common/const";
 import ScreenIndexedDB from "@/common/indexedDB";
 import { getSingleKey } from "@/common/storage";
-import { clearTimer, initTimer } from "@/common/timer";
+import { clearTimer } from "@/common/timer";
 import {
 	discardAllTab,
 	discardTab,
 	getAllTabs
 } from "@/common/utils";
 
+const COLUMN_COUNT = 4;
+
 const screenDB = new ScreenIndexedDB();
 let activeTab = null;
 const display = async () => {
 	const activated = await getSingleKey(ACTIVATED);
-	document.getElementById('startStop').innerText = activated ? 'Stop It' : 'Start It';
+	const status = document.getElementById('startStop');
+	status.innerText = activated ? 'Stop It' : 'Start It';
+	status.classList = activated ? 'chip danger' : 'chip info';
 
 	[...document.querySelectorAll('[data-ttl]')].forEach(e => clearInterval(e.dataset.ttl));
 
@@ -60,12 +64,12 @@ const displayGroup = async (tabs, tabContainerDOM, index) => {
 	tabs.forEach((t, i) => t.index = i);
 
 	const groupId = tabs[0].groupId;
-	const groupName = (groupId == -1 || !groupId) ? 'Ungrouped Tab' : (await chrome.tabGroups.get(groupId)).title;
+	const noGroup = (groupId == -1 || !groupId);
+	const groupName = noGroup ? 'Ungrouped Tab' : (await chrome.tabGroups.get(groupId)).title;
 	const groupDOM = document.getElementById('groupTile').content.cloneNode(true);
 	groupDOM.id = groupId;
 	groupDOM.querySelector('.title').innerText = groupName;
 	groupDOM.querySelector('.group-tile').style.order = groupId == -1 ? 999 : index;
-
 	const promises = tabs.map(tab => displayTab(tab, groupDOM));
 	Promise.all(promises).then(() => tabContainerDOM.appendChild(groupDOM))
 }
@@ -77,6 +81,8 @@ const displayTab = (tab, groupDOM) => {
 
 			const tile = tabDOM.querySelector('.tile');
 			tile.style.order = tab.index;
+			tab.index % COLUMN_COUNT == 0 && tile.classList.add('edge-left')
+			tab.index > 0 && tab.index % (COLUMN_COUNT - 1) == 0 && tile.classList.add('edge-right')
 			tile.id = tab.id + '|' + (row && row.updated_at);
 			tabDOM.querySelector('.title').innerText = tab.title;
 			if (!tab.discarded) {

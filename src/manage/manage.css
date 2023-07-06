@@ -52,8 +52,36 @@ body code.title {
 	aspect-ratio: 18/9;
 }
 
-.tile-group .tile .review-container:hover * {
+.tile-group .tile .review-container:hover .review {
 	transform: scale(2);
+	z-index: 9999;
+	position: fixed;
+	width: 20vw;
+}
+
+.tile-group .tile.edge-left .review-container:hover .review {
+	transform-origin: left;
+}
+
+.tile-group .tile.edge-right .review-container:hover .review {
+	transform-origin: right;
+}
+
+.tile-group.recent .tile .review-container:hover .review {
+	transform-origin: top;
+}
+
+.tile-group.recent .tile.edge-left .review-container:hover .review {
+	transform-origin: top left;
+}
+
+.tile-group.recent .tile.edge-right .review-container:hover .review {
+	transform-origin: top right;
+}
+
+.tile-group .tile .review-container:hover :not(.review),
+.tile-group .tile .review-container:hover + * {
+	display: none;
 }
 
 .review-container {
@@ -93,4 +121,45 @@ body code.title {
 .ttl {
 	position: relative;
 	top: -4px;
+}
+
+.chip {
+	padding: 8px 10px;
+	border-radius: 10px;
+	font-weight: 600;
+	font-size: 12px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+	margin: 0 10px;
+
+	cursor: pointer;
+}
+
+.chip.primary {
+	background: #2F4058;
+	color: whitesmoke;
+}
+
+.chip.secondary {
+	background: #242933;
+	color: #777;
+}
+
+.chip.warning {
+	background: #FEB904;
+	color: whitesmoke;
+}
+
+.chip.danger {
+	background: #DA605B;
+	color: whitesmoke;
+}
+
+.chip.info {
+	background: #5FD6D4;
+	color: whitesmoke;
+}
+
+.btn-group {
+	margin-bottom: 20px;
+	margin-top: 20px;
 }
